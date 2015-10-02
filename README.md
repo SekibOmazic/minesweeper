@@ -16,9 +16,16 @@ See <a href="http://rawgit.com/SekibOmazic/minesweeper/master/index.html">Live d
 
 Of course you can just open index.html directly in your browser.
 
+There is also `OldMinesweeper.elm`. You can take the source code and past it on  <a href="http://elm-lang.org/try">ELM Repl</a> and run it there.
+
+## Optimization
+
+Currently using `List` for the mine field. This was for the learning purpose.
+
+The the `generateBoard` function is really slow and need improvement. Maybe I should switch to `Array` to make it faster?
 
 ## TODO
 
-* Add some fancy icons
+* Make board generation faster
 * Enable mine flags
 * Add more levels

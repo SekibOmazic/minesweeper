@@ -1,14 +1,14 @@
-module Minesweeper where
+module OldMinesweeper where
 
 
-import Color exposing (red, blue, white, purple)
+import Color exposing (red, blue, grey, purple)
 import Graphics.Element exposing (..)
 import Graphics.Input exposing (clickable)
 
 import Signal
 
 import Random exposing (..)
-import Text
+import Text exposing (fromString)
 ---------
 -- Model
 ---------
@@ -205,54 +205,78 @@ clearCellAndNeighbors cells board =
 --------
 -- View
 --------
+smaller : (comparable, comparable) -> comparable
+smaller (x, y) = min x y
+
+
+bigger : (comparable, comparable) -> comparable
+bigger (x, y) = max x y
+
 
 drawCell : ViewConfig -> Cell -> LastClick -> Element
 drawCell config cell last =
   let
-    square = image 24 24
-    bomb = if cell.position == last then "redmine.png" else "mine.png"
+    screen = smaller config.screenDimensions
+    nCells = bigger boardDimensions
+    cellSize = (( screen - (nCells-1)*space ) // nCells)
 
-    coveredCell = square <| "/images/cell/button.png"
+    bombColor = if cell.position == last then purple else red
 
-    clearedCell = case cell.content of
-      Mine        -> square <| "/images/cell/" ++ bomb
-      Neighbors n -> square <| "/images/cell/" ++ (toString n) ++ ".png"
+    cellElement = case cell.content of
+      Mine        -> color bombColor  <| container cellSize cellSize middle <| centered <| fromString "!"
+      Neighbors 0 -> color grey <| spacer cellSize cellSize
+      Neighbors n -> color grey <| container cellSize cellSize middle <| show n
+
+    square = color blue <| container cellSize cellSize middle <| centered <| fromString "" --show cell.position
 
   in
     case cell.state of
-      Cleared -> clearedCell
-      _       -> clickable (Signal.message clicks.address (Click cell.position) ) coveredCell
+      Cleared -> cellElement
+      _       -> clickable (Signal.message clicks.address (Click cell.position) ) square
 
 
 drawRow : ViewConfig -> List Cell -> LastClick -> Element
 drawRow config row last =
-  flow right (List.map (\cell -> drawCell config cell last) row)
+  let squares = List.map (\cell -> drawCell config cell last) row
+      between = spacer 2 2
+
+  in
+      flow right (List.intersperse between squares)
 
 
 drawBoard : ViewConfig -> Board -> LastClick -> Element
 drawBoard config board last =
-  flow down (List.map (\row -> drawRow config row last) board)
+  let
+    rows = List.map (\row -> drawRow config row last) board
+    between = spacer 2 2
+
+  in
+    flow down (List.intersperse between rows)
 
 
 drawButton : GameState -> Element
 drawButton gameState =
   let
-    png = case gameState of
-      Won  -> "/images/face/victory.png"
-      Lost -> "/images/face/oh.png"
-      _    -> "/images/face/defeat.png"
+    buttonText = case gameState of
+      Won  -> "You Won!"
+      Lost -> "Oops"
+      _    -> "Reset"
 
-    msg = Text.fromString "Click to restart" |> Text.color white |> Text.height 24
-    buttonWithText = flow right [image 32 32 png,  msg |> rightAligned |> width 330]
-    header = buttonWithText |> container 384 48 middle |> color purple
+    button = fromString buttonText |> centered |> container 200 30 middle |> color grey
 
   in
-    clickable (Signal.message clicks.address ResetGame) header
+    clickable (Signal.message clicks.address ResetGame ) button
 
 
 view : ViewConfig -> Game -> Element
 view config (gameState, board, last, seed) =
-     flow down [
+  let
+    w = fst config.screenDimensions
+    h = snd config.screenDimensions
+
+  in
+    container w h middle
+      <| flow down [
             drawButton gameState,
             drawBoard config board last
          ]
@@ -267,16 +291,17 @@ update action (gameState, board, last, seed) =
       generateBoard (fst boardDimensions) (snd boardDimensions) numberOfMines seed
 
     Click (x, y) ->
-      let
-        (cellState, cellContent) = cellStateAndContent (x,y) board
+        let
+          (cellState, cellContent) = cellStateAndContent (x,y) board
 
-        restCells = safeClicks board
+          restCells = safeClicks board
 
-      in
-        case (cellState, cellContent, restCells) of
-          (Covered, Mine, _) -> (Lost, clearBoard board, (x,y), seed)
-          (Covered, _,    1) -> (Won,  clearBoard board, (x,y), seed)
-          _                  -> (Playing, clearCellAndNeighbors [(x,y)] board, (x,y), seed)
+        in
+          case (cellState, cellContent, restCells) of
+            -- (Cleared, _,    _) -> (Playing, board, seed) -- can never happen!!!
+            (Covered, Mine, _) -> (Lost, clearBoard board, (x,y), seed)
+            (Covered, _,    1) -> (Won,  clearBoard board, (x,y), seed)
+            _                  -> (Playing, clearCellAndNeighbors [(x,y)] board, (x,y), seed)
 
 
 -- Signals
