@@ -2411,10 +2411,10 @@ Elm.Minesweeper.make = function (_elm) {
          var png = function () {
             switch (gameState.ctor)
             {case "Lost":
-               return "/images/face/oh.png";
+               return "images/face/oh.png";
                case "Won":
-               return "/images/face/victory.png";}
-            return "/images/face/defeat.png";
+               return "images/face/victory.png";}
+            return "images/face/defeat.png";
          }();
          var buttonWithText = A2($Graphics$Element.flow,
          $Graphics$Element.right,
@@ -2451,17 +2451,17 @@ Elm.Minesweeper.make = function (_elm) {
          var square = A2($Graphics$Element.image,
          24,
          24);
-         var coveredCell = square("/images/cell/button.png");
+         var coveredCell = square("images/cell/button.png");
          var clearedCell = function () {
             var _v41 = cell.content;
             switch (_v41.ctor)
             {case "Mine":
                return square(A2($Basics._op["++"],
-                 "/images/cell/",
+                 "images/cell/",
                  bomb));
                case "Neighbors":
                return square(A2($Basics._op["++"],
-                 "/images/cell/",
+                 "images/cell/",
                  A2($Basics._op["++"],
                  $Basics.toString(_v41._0),
                  ".png")));}

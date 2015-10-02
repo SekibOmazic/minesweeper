@@ -212,11 +212,11 @@ drawCell config cell last =
     square = image 24 24
     bomb = if cell.position == last then "redmine.png" else "mine.png"
 
-    coveredCell = square <| "/images/cell/button.png"
+    coveredCell = square <| "images/cell/button.png"
 
     clearedCell = case cell.content of
-      Mine        -> square <| "/images/cell/" ++ bomb
-      Neighbors n -> square <| "/images/cell/" ++ (toString n) ++ ".png"
+      Mine        -> square <| "images/cell/" ++ bomb
+      Neighbors n -> square <| "images/cell/" ++ (toString n) ++ ".png"
 
   in
     case cell.state of
@@ -238,9 +238,9 @@ drawButton : GameState -> Element
 drawButton gameState =
   let
     png = case gameState of
-      Won  -> "/images/face/victory.png"
-      Lost -> "/images/face/oh.png"
-      _    -> "/images/face/defeat.png"
+      Won  -> "images/face/victory.png"
+      Lost -> "images/face/oh.png"
+      _    -> "images/face/defeat.png"
 
     msg = Text.fromString "Click to restart" |> Text.color white |> Text.height 24
     buttonWithText = flow right [image 32 32 png,  msg |> rightAligned |> width 330]
