@@ -4,7 +4,7 @@ My first take on Elm
 
 ## Demo
 
-See <a href="http://rawgit.com/SekibOmazic/minesweeper/master/index.html">Live demo</a>
+See <a href="http://sekibomazic.github.io/minesweeper/">Live demo</a>
 
 
 ## How to run
