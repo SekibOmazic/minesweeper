@@ -2037,49 +2037,86 @@ Elm.Minesweeper.make = function (_elm) {
                        case "[]":
                        return $Maybe.Nothing;}
                     _U.badCase($moduleName,
-                    "between lines 141 and 143");
+                    "between lines 133 and 135");
                  }();
               }();}
          _U.badCase($moduleName,
-         "between lines 136 and 143");
+         "between lines 128 and 135");
       }();
    });
-   var boardCols = function (board) {
-      return $List.length(A2($Maybe.withDefault,
-      _L.fromArray([]),
-      $List.head(board)));
-   };
-   var boardRows = function (board) {
-      return $List.length(board);
-   };
-   var neighbors = function (_v7) {
+   var generatePositions = F5(function (n,
+   rows,
+   cols,
+   positions,
+   seed) {
+      return _U.eq($List.length(positions),
+      n) ? {ctor: "_Tuple2"
+           ,_0: positions
+           ,_1: seed} : function () {
+         var $ = A2($Random.generate,
+         A2($Random.$int,1,rows),
+         seed),
+         x = $._0,
+         seed1 = $._1;
+         var $ = A2($Random.generate,
+         A2($Random.$int,1,cols),
+         seed1),
+         y = $._0,
+         seed2 = $._1;
+         return function () {
+            var _v7 = A2($List.member,
+            {ctor: "_Tuple2",_0: x,_1: y},
+            positions);
+            switch (_v7)
+            {case false:
+               return A5(generatePositions,
+                 n,
+                 rows,
+                 cols,
+                 A2($List._op["::"],
+                 {ctor: "_Tuple2",_0: x,_1: y},
+                 positions),
+                 seed2);
+               case true:
+               return A5(generatePositions,
+                 n,
+                 rows,
+                 cols,
+                 positions,
+                 seed2);}
+            _U.badCase($moduleName,
+            "between lines 99 and 101");
+         }();
+      }();
+   });
+   var neighbors = function (_v8) {
       return function () {
-         switch (_v7.ctor)
+         switch (_v8.ctor)
          {case "_Tuple2":
             return _L.fromArray([{ctor: "_Tuple2"
-                                 ,_0: _v7._0 - 1
-                                 ,_1: _v7._1 - 1}
+                                 ,_0: _v8._0 - 1
+                                 ,_1: _v8._1 - 1}
                                 ,{ctor: "_Tuple2"
-                                 ,_0: _v7._0
-                                 ,_1: _v7._1 - 1}
+                                 ,_0: _v8._0
+                                 ,_1: _v8._1 - 1}
                                 ,{ctor: "_Tuple2"
-                                 ,_0: _v7._0 + 1
-                                 ,_1: _v7._1 - 1}
+                                 ,_0: _v8._0 + 1
+                                 ,_1: _v8._1 - 1}
                                 ,{ctor: "_Tuple2"
-                                 ,_0: _v7._0 - 1
-                                 ,_1: _v7._1}
+                                 ,_0: _v8._0 - 1
+                                 ,_1: _v8._1}
                                 ,{ctor: "_Tuple2"
-                                 ,_0: _v7._0 + 1
-                                 ,_1: _v7._1}
+                                 ,_0: _v8._0 + 1
+                                 ,_1: _v8._1}
                                 ,{ctor: "_Tuple2"
-                                 ,_0: _v7._0 - 1
-                                 ,_1: _v7._1 + 1}
+                                 ,_0: _v8._0 - 1
+                                 ,_1: _v8._1 + 1}
                                 ,{ctor: "_Tuple2"
-                                 ,_0: _v7._0
-                                 ,_1: _v7._1 + 1}
+                                 ,_0: _v8._0
+                                 ,_1: _v8._1 + 1}
                                 ,{ctor: "_Tuple2"
-                                 ,_0: _v7._0 + 1
-                                 ,_1: _v7._1 + 1}]);}
+                                 ,_0: _v8._0 + 1
+                                 ,_1: _v8._1 + 1}]);}
          _U.badCase($moduleName,
          "between lines 61 and 63");
       }();
@@ -2098,61 +2135,40 @@ Elm.Minesweeper.make = function (_elm) {
              ,_0: a};
    };
    var Mine = {ctor: "Mine"};
-   var placeMine = F3(function (x,
-   y,
+   var isCellMined = F2(function (_v12,
    board) {
       return function () {
-         var mineCell = function (cell) {
-            return _U.eq(cell.position,
-            {ctor: "_Tuple2"
-            ,_0: x
-            ,_1: y}) ? _U.replace([["content"
-                                   ,Mine]],
-            cell) : cell;
-         };
-         return A2($List.map,
-         function (row) {
-            return A2($List.map,
-            mineCell,
-            row);
-         },
-         board);
-      }();
-   });
-   var isCellMined = F2(function (_v11,
-   board) {
-      return function () {
-         switch (_v11.ctor)
+         switch (_v12.ctor)
          {case "_Tuple2":
             return function () {
-                 var _v15 = A2(takeCell,
+                 var _v16 = A2(takeCell,
                  {ctor: "_Tuple2"
-                 ,_0: _v11._0
-                 ,_1: _v11._1},
+                 ,_0: _v12._0
+                 ,_1: _v12._1},
                  board);
-                 switch (_v15.ctor)
+                 switch (_v16.ctor)
                  {case "Just":
-                    return _U.eq(_v15._0.content,
+                    return _U.eq(_v16._0.content,
                       Mine);
                     case "Nothing": return false;}
                  _U.badCase($moduleName,
-                 "between lines 155 and 157");
+                 "between lines 147 and 149");
               }();}
          _U.badCase($moduleName,
-         "between lines 155 and 157");
+         "between lines 147 and 149");
       }();
    });
    var countMines = F2(function (cell,
    board) {
       return function () {
-         var mineCount = function (_v17) {
+         var mineCount = function (_v18) {
             return function () {
-               switch (_v17.ctor)
+               switch (_v18.ctor)
                {case "_Tuple2":
                   return A2(isCellMined,
                     {ctor: "_Tuple2"
-                    ,_0: _v17._0
-                    ,_1: _v17._1},
+                    ,_0: _v18._0
+                    ,_1: _v18._1},
                     board) ? 1 : 0;}
                _U.badCase($moduleName,
                "on line 69, column 23 to 63");
@@ -2184,40 +2200,6 @@ Elm.Minesweeper.make = function (_elm) {
          board);
       }();
    };
-   var placeMines = F3(function (n,
-   board,
-   seed) {
-      return _U.eq(n,
-      0) ? {ctor: "_Tuple2"
-           ,_0: calculateNeighbors(board)
-           ,_1: seed} : function () {
-         var $ = A2($Random.generate,
-         A2($Random.$int,
-         1,
-         boardRows(board)),
-         seed),
-         mineX = $._0,
-         seed1 = $._1;
-         var $ = A2($Random.generate,
-         A2($Random.$int,
-         1,
-         boardCols(board)),
-         seed1),
-         mineY = $._0,
-         seed2 = $._1;
-         return A2(isCellMined,
-         {ctor: "_Tuple2"
-         ,_0: mineX
-         ,_1: mineY},
-         board) ? A3(placeMines,
-         n,
-         board,
-         seed2) : A3(placeMines,
-         n - 1,
-         A3(placeMine,mineX,mineY,board),
-         seed2);
-      }();
-   });
    var Covered = {ctor: "Covered"};
    var createBoard = F2(function (rows,
    cols) {
@@ -2252,16 +2234,32 @@ Elm.Minesweeper.make = function (_elm) {
          var dummyBoard = A2(createBoard,
          rows,
          cols);
-         var $ = A3(placeMines,
+         var $ = A5(generatePositions,
          nMines,
-         dummyBoard,
+         rows,
+         cols,
+         _L.fromArray([]),
          seed),
-         minefield = $._0,
+         positions = $._0,
          newSeed = $._1;
-         var minefieldWithNeighbors = calculateNeighbors(minefield);
+         var update = function (cell) {
+            return A2($List.member,
+            cell.position,
+            positions) ? _U.replace([["content"
+                                     ,Mine]],
+            cell) : cell;
+         };
+         var minefieldWithoutNeighbors = A2($List.map,
+         function (row) {
+            return A2($List.map,
+            update,
+            row);
+         },
+         dummyBoard);
+         var minefield = calculateNeighbors(minefieldWithoutNeighbors);
          return {ctor: "_Tuple4"
                 ,_0: Playing
-                ,_1: minefieldWithNeighbors
+                ,_1: minefield
                 ,_2: {ctor: "_Tuple2"
                      ,_0: 0
                      ,_1: 0}
@@ -2269,31 +2267,31 @@ Elm.Minesweeper.make = function (_elm) {
       }();
    });
    var Cleared = {ctor: "Cleared"};
-   var cellStateAndContent = F2(function (_v21,
+   var cellStateAndContent = F2(function (_v22,
    board) {
       return function () {
-         switch (_v21.ctor)
+         switch (_v22.ctor)
          {case "_Tuple2":
             return function () {
-                 var _v25 = A2(takeCell,
+                 var _v26 = A2(takeCell,
                  {ctor: "_Tuple2"
-                 ,_0: _v21._0
-                 ,_1: _v21._1},
+                 ,_0: _v22._0
+                 ,_1: _v22._1},
                  board);
-                 switch (_v25.ctor)
+                 switch (_v26.ctor)
                  {case "Just":
                     return {ctor: "_Tuple2"
-                           ,_0: _v25._0.state
-                           ,_1: _v25._0.content};
+                           ,_0: _v26._0.state
+                           ,_1: _v26._0.content};
                     case "Nothing":
                     return {ctor: "_Tuple2"
                            ,_0: Cleared
                            ,_1: Neighbors(0)};}
                  _U.badCase($moduleName,
-                 "between lines 148 and 150");
+                 "between lines 140 and 142");
               }();}
          _U.badCase($moduleName,
-         "between lines 148 and 150");
+         "between lines 140 and 142");
       }();
    });
    var safeClicks = function (board) {
@@ -2311,10 +2309,10 @@ Elm.Minesweeper.make = function (_elm) {
          flat);
       }();
    };
-   var clearCell = F2(function (_v27,
+   var clearCell = F2(function (_v28,
    board) {
       return function () {
-         switch (_v27.ctor)
+         switch (_v28.ctor)
          {case "_Tuple2":
             return A2($List.map,
               function (row) {
@@ -2322,8 +2320,8 @@ Elm.Minesweeper.make = function (_elm) {
                  function (cell) {
                     return _U.eq(cell.position,
                     {ctor: "_Tuple2"
-                    ,_0: _v27._0
-                    ,_1: _v27._1}) ? _U.replace([["state"
+                    ,_0: _v28._0
+                    ,_1: _v28._1}) ? _U.replace([["state"
                                                  ,Cleared]],
                     cell) : cell;
                  },
@@ -2331,7 +2329,7 @@ Elm.Minesweeper.make = function (_elm) {
               },
               board);}
          _U.badCase($moduleName,
-         "on line 176, column 3 to 120");
+         "on line 168, column 3 to 120");
       }();
    });
    var clearCellAndNeighbors = F2(function (cells,
@@ -2342,26 +2340,26 @@ Elm.Minesweeper.make = function (_elm) {
             switch (cells._0.ctor)
               {case "_Tuple2":
                  return function () {
-                      var _v36 = A2(cellStateAndContent,
+                      var _v37 = A2(cellStateAndContent,
                       {ctor: "_Tuple2"
                       ,_0: cells._0._0
                       ,_1: cells._0._1},
                       board);
-                      switch (_v36.ctor)
+                      switch (_v37.ctor)
                       {case "_Tuple2":
-                         switch (_v36._0.ctor)
+                         switch (_v37._0.ctor)
                            {case "Cleared":
                               return A2(clearCellAndNeighbors,
                                 cells._1,
                                 board);
                               case "Covered":
-                              switch (_v36._1.ctor)
+                              switch (_v37._1.ctor)
                                 {case "Mine":
                                    return A2(clearCellAndNeighbors,
                                      cells._1,
                                      board);
                                    case "Neighbors":
-                                   switch (_v36._1._0)
+                                   switch (_v37._1._0)
                                      {case 0: return function () {
                                              var newList = A2($List.append,
                                              neighbors({ctor: "_Tuple2"
@@ -2382,12 +2380,12 @@ Elm.Minesweeper.make = function (_elm) {
                                 break;}
                            break;}
                       _U.badCase($moduleName,
-                      "between lines 197 and 201");
+                      "between lines 180 and 184");
                    }();}
               break;
             case "[]": return board;}
          _U.badCase($moduleName,
-         "between lines 195 and 201");
+         "between lines 178 and 184");
       }();
    });
    var clearBoard = function (board) {
@@ -2453,8 +2451,8 @@ Elm.Minesweeper.make = function (_elm) {
          24);
          var coveredCell = square("images/cell/button.png");
          var clearedCell = function () {
-            var _v41 = cell.content;
-            switch (_v41.ctor)
+            var _v42 = cell.content;
+            switch (_v42.ctor)
             {case "Mine":
                return square(A2($Basics._op["++"],
                  "images/cell/",
@@ -2463,14 +2461,14 @@ Elm.Minesweeper.make = function (_elm) {
                return square(A2($Basics._op["++"],
                  "images/cell/",
                  A2($Basics._op["++"],
-                 $Basics.toString(_v41._0),
+                 $Basics.toString(_v42._0),
                  ".png")));}
             _U.badCase($moduleName,
-            "between lines 217 and 221");
+            "between lines 200 and 204");
          }();
          return function () {
-            var _v43 = cell.state;
-            switch (_v43.ctor)
+            var _v44 = cell.state;
+            switch (_v44.ctor)
             {case "Cleared":
                return clearedCell;}
             return A2($Graphics$Input.clickable,
@@ -2510,19 +2508,19 @@ Elm.Minesweeper.make = function (_elm) {
       board));
    });
    var view = F2(function (config,
-   _v44) {
+   _v45) {
       return function () {
-         switch (_v44.ctor)
+         switch (_v45.ctor)
          {case "_Tuple4":
             return A2($Graphics$Element.flow,
               $Graphics$Element.down,
-              _L.fromArray([drawButton(_v44._0)
+              _L.fromArray([drawButton(_v45._0)
                            ,A3(drawBoard,
                            config,
-                           _v44._1,
-                           _v44._2)]));}
+                           _v45._1,
+                           _v45._2)]));}
          _U.badCase($moduleName,
-         "between lines 255 and 258");
+         "between lines 238 and 241");
       }();
    });
    var initConfig = {_: {}
@@ -2543,9 +2541,9 @@ Elm.Minesweeper.make = function (_elm) {
                 ,_1: 20};
    var numberOfMines = 40;
    var update = F2(function (action,
-   _v50) {
+   _v51) {
       return function () {
-         switch (_v50.ctor)
+         switch (_v51.ctor)
          {case "_Tuple4":
             return function () {
                  switch (action.ctor)
@@ -2553,40 +2551,40 @@ Elm.Minesweeper.make = function (_elm) {
                     switch (action._0.ctor)
                       {case "_Tuple2":
                          return function () {
-                              var restCells = safeClicks(_v50._1);
+                              var restCells = safeClicks(_v51._1);
                               var $ = A2(cellStateAndContent,
                               {ctor: "_Tuple2"
                               ,_0: action._0._0
                               ,_1: action._0._1},
-                              _v50._1),
+                              _v51._1),
                               cellState = $._0,
                               cellContent = $._1;
                               return function () {
-                                 var _v60 = {ctor: "_Tuple3"
+                                 var _v61 = {ctor: "_Tuple3"
                                             ,_0: cellState
                                             ,_1: cellContent
                                             ,_2: restCells};
-                                 switch (_v60.ctor)
+                                 switch (_v61.ctor)
                                  {case "_Tuple3":
-                                    switch (_v60._0.ctor)
+                                    switch (_v61._0.ctor)
                                       {case "Covered":
-                                         switch (_v60._1.ctor)
+                                         switch (_v61._1.ctor)
                                            {case "Mine":
                                               return {ctor: "_Tuple4"
                                                      ,_0: Lost
-                                                     ,_1: clearBoard(_v50._1)
+                                                     ,_1: clearBoard(_v51._1)
                                                      ,_2: {ctor: "_Tuple2"
                                                           ,_0: action._0._0
                                                           ,_1: action._0._1}
-                                                     ,_3: _v50._3};}
-                                           switch (_v60._2)
+                                                     ,_3: _v51._3};}
+                                           switch (_v61._2)
                                            {case 1: return {ctor: "_Tuple4"
                                                            ,_0: Won
-                                                           ,_1: clearBoard(_v50._1)
+                                                           ,_1: clearBoard(_v51._1)
                                                            ,_2: {ctor: "_Tuple2"
                                                                 ,_0: action._0._0
                                                                 ,_1: action._0._1}
-                                                           ,_3: _v50._3};}
+                                                           ,_3: _v51._3};}
                                            break;}
                                       break;}
                                  return {ctor: "_Tuple4"
@@ -2595,11 +2593,11 @@ Elm.Minesweeper.make = function (_elm) {
                                         _L.fromArray([{ctor: "_Tuple2"
                                                       ,_0: action._0._0
                                                       ,_1: action._0._1}]),
-                                        _v50._1)
+                                        _v51._1)
                                         ,_2: {ctor: "_Tuple2"
                                              ,_0: action._0._0
                                              ,_1: action._0._1}
-                                        ,_3: _v50._3};
+                                        ,_3: _v51._3};
                               }();
                            }();}
                       break;
@@ -2608,12 +2606,12 @@ Elm.Minesweeper.make = function (_elm) {
                       $Basics.fst(boardDimensions),
                       $Basics.snd(boardDimensions),
                       numberOfMines,
-                      _v50._3);}
+                      _v51._3);}
                  _U.badCase($moduleName,
-                 "between lines 265 and 279");
+                 "between lines 248 and 262");
               }();}
          _U.badCase($moduleName,
-         "between lines 265 and 279");
+         "between lines 248 and 262");
       }();
    });
    var main = function () {
@@ -2652,11 +2650,8 @@ Elm.Minesweeper.make = function (_elm) {
                              ,neighbors: neighbors
                              ,countMines: countMines
                              ,calculateNeighbors: calculateNeighbors
+                             ,generatePositions: generatePositions
                              ,generateBoard: generateBoard
-                             ,boardRows: boardRows
-                             ,boardCols: boardCols
-                             ,placeMines: placeMines
-                             ,placeMine: placeMine
                              ,takeCell: takeCell
                              ,cellStateAndContent: cellStateAndContent
                              ,isCellMined: isCellMined

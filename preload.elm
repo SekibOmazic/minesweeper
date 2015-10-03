@@ -38,3 +38,9 @@ drawCell config cell last =
         (Cleared, Neighbors n) -> case Dict.get (toString n) imageDict of
                                     Nothing -> dummy
                                     Just img -> img
+
+
+-- Update nth item of the list
+updateN : Int -> (a -> a) -> List a -> List a
+updateN n f list =
+  List.indexedMap (\index value -> if index == n then f value else value) list

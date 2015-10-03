@@ -23,7 +23,7 @@ boardDimensions = (16, 16)
 -- TODO: get screen dimensions as Window.dimensions
 type alias ViewConfig = { screenDimensions : (Int, Int) }
 
-initConfig = { screenDimensions = (500, 600) }
+initConfig = { screenDimensions = (500, 600) } -- not used yet
 
 
 type Action = Click (Int, Int) | Resize (Int, Int) | ResetGame
@@ -85,50 +85,42 @@ calculateNeighbors board =
     List.map (\row -> List.map updateCellNeighbors row) board
 
 
+-- generate random list of unique (Int, Int) pairs
+generatePositions : Int -> Int -> Int -> List (Int, Int) -> Seed -> (List (Int, Int), Seed)
+generatePositions n rows cols positions seed =
+  if List.length positions == n
+    then
+      (positions, seed)
+    else
+      let
+        (x, seed1) = Random.generate (Random.int 1 rows) seed
+        (y, seed2) = Random.generate (Random.int 1 cols) seed1
+      in
+        case List.member (x, y) positions of
+          True  -> generatePositions n rows cols positions seed2
+          False -> generatePositions n rows cols ((x, y) :: positions) seed2
+
+
 generateBoard : Int -> Int -> Int -> Seed -> Game
 generateBoard rows cols nMines seed =
   let
+    -- create mine positions
+    (positions, newSeed)  = generatePositions nMines rows cols [] seed
+
+    -- create empty board
     dummyBoard = createBoard rows cols
-    (minefield, newSeed) = placeMines nMines dummyBoard seed
-    minefieldWithNeighbors = calculateNeighbors minefield
+
+    -- helper
+    update cell = if List.member cell.position positions then { cell | content <- Mine } else cell
+
+    -- board with mines
+    minefieldWithoutNeighbors = List.map (\row -> List.map update row) dummyBoard
+
+    -- and with neighbors
+    minefield  = calculateNeighbors minefieldWithoutNeighbors
 
   in
-    (Playing, minefieldWithNeighbors, (0,0), newSeed)
-
-
-boardRows : Board -> Int
-boardRows board = List.length board
-
-
-boardCols : Board -> Int
-boardCols board = List.length (Maybe.withDefault [] (List.head board))
-
-
-placeMines : Int -> Board -> Seed -> (Board, Seed)
-placeMines n board seed =
-  if n == 0
-    then
-      (calculateNeighbors board, seed)
-    else
-      let
-        (mineX, seed1) = generate (int 1 (boardRows board)) seed
-        (mineY, seed2) = generate (int 1 (boardCols board)) seed1
-      in
-        if (isCellMined (mineX, mineY) board)
-          then placeMines n board seed2 -- cell already mined, try again
-          else placeMines (n-1) (placeMine mineX mineY board) seed2
-
-
-placeMine : Int -> Int -> Board -> Board
-placeMine x y board =
-  let
-    mineCell cell =
-      if cell.position == (x,y)
-        then { cell | content <- Mine }
-        else cell
-
-  in
-    List.map (\row -> List.map mineCell row) board
+    (Playing, minefield, (0,0), newSeed)
 
 
 takeCell : (Int, Int) -> Board -> Maybe Cell
@@ -174,15 +166,6 @@ safeClicks board =
 clearCell : (Int, Int) -> Board -> Board
 clearCell (x,y) board =
   List.map (\row -> List.map (\cell -> if cell.position == (x,y) then { cell | state <- Cleared } else cell) row) board
-  {- SAME AS ABOVE BUT MORE READABLE
-  let
-    clearCell cell =
-       if cell.position == (x,y)
-          then { cell | state <- Cleared }
-          else cell
-  in
-    List.map (\row -> List.map clearCell row) board
-  -}
 
 
 clearBoard : Board -> Board
@@ -289,7 +272,7 @@ userClicks = clicks.signal
 
 -- TODO: add Windows.dimensions
 viewConfig : Signal ViewConfig
-viewConfig = Signal.constant initConfig
+viewConfig = Signal.constant initConfig -- not used, just passed through
 
 
 main : Signal Element
