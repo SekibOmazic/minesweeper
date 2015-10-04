@@ -1,14 +1,16 @@
 module Minesweeper where
 
 
-import Color exposing (red, blue, white, purple)
+import Color exposing (red, blue, white, purple, lightGrey)
 import Graphics.Element exposing (..)
 import Graphics.Input exposing (clickable)
 
+import Signal exposing ((<~), (~))
 import Signal
 
 import Random exposing (..)
 import Text
+import Window
 ---------
 -- Model
 ---------
@@ -233,12 +235,13 @@ drawButton gameState =
     clickable (Signal.message clicks.address ResetGame) header
 
 
-view : ViewConfig -> Game -> Element
-view config (gameState, board, last, seed) =
-     flow down [
-            drawButton gameState,
-            drawBoard config board last
-         ]
+view : ViewConfig -> Game -> (Int, Int) -> Element
+view config (gameState, board, last, seed) (w, h) =
+  color lightGrey <| container w h middle
+                  <| flow down [
+                        drawButton gameState,
+                        drawBoard config board last
+                      ]
 
 ----------
 -- Update
@@ -281,4 +284,4 @@ main =
     initialGame = generateBoard (fst boardDimensions) (snd boardDimensions) numberOfMines (initialSeed 12345)
 
   in
-    Signal.map2 view viewConfig (Signal.foldp update initialGame userClicks)
+    view <~ viewConfig ~ (Signal.foldp update initialGame userClicks) ~ Window.dimensions
