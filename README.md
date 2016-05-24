@@ -2,6 +2,8 @@
 
 The game of Minesweeper written in Elm
 
+![Screenshot](screenshot.png)
+
 ## Demo
 
 [Live demo](http://sekibomazic.github.io/minesweeper/)
