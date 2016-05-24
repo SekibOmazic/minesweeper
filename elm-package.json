@@ -2,7 +2,7 @@
     "version": "1.0.0",
     "summary": "Minesweeper",
     "repository": "https://github.com/SekibOmazic/minesweeper.git",
-    "license": "BSD3",
+    "license": "MIT",
     "source-directories": [
         "."
     ],
