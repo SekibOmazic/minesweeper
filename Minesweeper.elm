@@ -1,16 +1,13 @@
 module Minesweeper where
 
-
-import Color exposing (red, blue, white, purple, lightGrey)
 import Graphics.Element exposing (..)
 import Graphics.Input exposing (clickable)
-
-import Signal exposing ((<~), (~))
-import Signal
-
-import Random exposing (..)
+import Color exposing (white, purple, lightGrey)
 import Text
 import Window
+import Random exposing (..)
+import Signal
+import Signal.Extra exposing (andMap)
 
 ---------
 -- Model
@@ -28,8 +25,7 @@ type alias ViewConfig = { screenDimensions : (Int, Int) }
 
 initConfig = { screenDimensions = (500, 600) } -- not used yet
 
-
-type Action = Click (Int, Int) | Resize (Int, Int) | ResetGame
+type Action = Click (Int, Int) | ResetGame
 
 -- Cell
 type CellState  = Cleared | Covered
@@ -54,7 +50,6 @@ createBoard rows cols =
     createCell x y = {   position = (x, y)
                        , state    = Covered
                        , content  = Neighbors 0  }
-
   in
     List.map (\row -> (List.map (\col -> createCell row col) [1..cols])) [1..rows]
 
@@ -70,10 +65,8 @@ countMines : Cell -> Board -> Int
 countMines cell board =
   let
     mineCount (x,y) = if isCellMined (x,y) board then 1 else 0
-
   in
     List.foldl (+) 0 <| List.map mineCount <| neighbors cell.position
-    -- List.foldl (+) 0 (List.map mineCount <| neighbors cell.position)
 
 
 calculateNeighbors : Board -> Board
@@ -82,8 +75,7 @@ calculateNeighbors board =
     updateCellNeighbors cell =
       if cell.content == Mine
         then cell
-        else { cell | content <- Neighbors (countMines cell board) }
-
+        else { cell | content = Neighbors (countMines cell board) }
   in
     List.map (\row -> List.map updateCellNeighbors row) board
 
@@ -114,14 +106,13 @@ generateBoard rows cols nMines seed =
     dummyBoard = createBoard rows cols
 
     -- helper
-    update cell = if List.member cell.position positions then { cell | content <- Mine } else cell
+    update cell = if List.member cell.position positions then { cell | content = Mine } else cell
 
     -- board with mines
     minefieldWithoutNeighbors = List.map (\row -> List.map update row) dummyBoard
 
     -- and with neighbors
     minefield  = calculateNeighbors minefieldWithoutNeighbors
-
   in
     (Playing, minefield, (0,0), newSeed)
 
@@ -131,7 +122,6 @@ takeCell (x, y) board =
   let
     flat = List.concat board
     found = List.filter (\cell -> cell.position == (x,y)) flat
-
   in
     case found of
       []     -> Nothing
@@ -161,19 +151,18 @@ safeClicks board =
       if cell.content == Mine || cell.state == Cleared
         then sum
         else sum + 1
-
   in
     List.foldl add 0 flat
 
 
 clearCell : (Int, Int) -> Board -> Board
 clearCell (x,y) board =
-  List.map (\row -> List.map (\cell -> if cell.position == (x,y) then { cell | state <- Cleared } else cell) row) board
+  List.map (\row -> List.map (\cell -> if cell.position == (x,y) then { cell | state = Cleared } else cell) row) board
 
 
 clearBoard : Board -> Board
 clearBoard board =
-  List.map (\row -> (List.map (\cell -> { cell | state <- Cleared }) row) ) board
+  List.map (\row -> (List.map (\cell -> { cell | state = Cleared }) row) ) board
 
 
 clearCellAndNeighbors : List (Int, Int) -> Board -> Board
@@ -185,7 +174,6 @@ clearCellAndNeighbors cells board =
         (Covered, Mine)        -> clearCellAndNeighbors rest board
         (Covered, Neighbors 0) -> let newList = List.append (neighbors (x,y)) rest in clearCellAndNeighbors newList <| clearCell (x, y) board
         (Covered, Neighbors n) -> clearCellAndNeighbors rest <| clearCell (x, y) board
-
 
 
 --------
@@ -203,7 +191,6 @@ drawCell config cell last =
     clearedCell = case cell.content of
       Mine        -> square <| "images/cell/" ++ bomb
       Neighbors n -> square <| "images/cell/" ++ (toString n) ++ ".png"
-
   in
     case cell.state of
       Cleared -> clearedCell
@@ -231,7 +218,6 @@ drawButton gameState =
     msg = Text.fromString "Click to restart" |> Text.color white |> Text.height 24
     buttonWithText = flow right [image 32 32 png,  msg |> rightAligned |> width 330]
     header = buttonWithText |> container 384 48 middle |> color purple
-
   in
     clickable (Signal.message clicks.address ResetGame) header
 
@@ -258,7 +244,6 @@ update action (gameState, board, last, seed) =
         (cellState, cellContent) = cellStateAndContent (x,y) board
 
         restCells = safeClicks board
-
       in
         case (cellState, cellContent, restCells) of
           (Covered, Mine, _) -> (Lost, clearBoard board, (x,y), seed)
@@ -283,6 +268,5 @@ main : Signal Element
 main =
   let
     initialGame = generateBoard (fst boardDimensions) (snd boardDimensions) numberOfMines (initialSeed 12345)
-
   in
-    view <~ viewConfig ~ (Signal.foldp update initialGame userClicks) ~ Window.dimensions
+    view `Signal.map` viewConfig `andMap` (Signal.foldp update initialGame userClicks) `andMap` Window.dimensions
